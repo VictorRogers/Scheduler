@@ -2,7 +2,7 @@ INC_DIR   := header
 SRC_DIR   := src
 OBJ_DIR   := object
 
-CC 		    := gcc
+CC        := gcc
 CPPFLAGS  := -I$(INC_DIR) -MMD -MP
 CFLAGS    := -std=c99 -pedantic -Wall
 
