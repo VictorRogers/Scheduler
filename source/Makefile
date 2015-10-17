@@ -4,7 +4,7 @@ OBJ_DIR   := object
 
 CC 		    := gcc
 CPPFLAGS  := -I$(INC_DIR) -MMD -MP
-CFLAGS    := -std=c99 -pedantic
+CFLAGS    := -std=c99 -pedantic -Wall
 
 SOURCES   := $(wildcard $(SRC_DIR)/*.c)
 OBJECTS   := $(SOURCES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
