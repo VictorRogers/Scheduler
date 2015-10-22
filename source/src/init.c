@@ -7,10 +7,10 @@ void init() {
   unsigned int i = 0;
   unsigned int numberOfJobs;
 
-  ifp = fopen("../input/input.txt", ifMode);
+  ifp = fopen("input/input.txt", ifMode);
 
   if (ifp == NULL) {
-    perror("Error");
+    perror("Error opening input file");
     exit(1);
   }
   
