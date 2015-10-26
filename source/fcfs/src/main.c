@@ -1,7 +1,6 @@
-#include "init.h"
+#include "system.h"
 
 int main(int argc, char* args[]) {
-  printf("test\n");
   init();
 
   return 0;

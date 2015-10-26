@@ -1,4 +1,4 @@
-#include "init.h"
+#include "system.h"
 
 void init() {
   FILE *ifp;
@@ -6,6 +6,10 @@ void init() {
   struct Job jobs[100];
   unsigned int i = 0;
   unsigned int numberOfJobs;
+  
+  cpu->clockTime = 0;
+  cpu->runTime = 1000;
+  cpu->status = 0;
 
   ifp = fopen("input/input.txt", ifMode);
 
@@ -21,7 +25,7 @@ void init() {
     numberOfJobs = i;
   }
 
-  runScheduler(jobs, numberOfJobs);
+  start(jobs, numberOfJobs);
 
   fclose(ifp); 
 }
@@ -34,18 +38,22 @@ unsigned int isJobComplete(unsigned int serviceTime) {
     return 0;
 }
 
-void runScheduler(struct Job jobs[100], unsigned int numberOfJobs) {
-  unsigned int clockTime = 0;
-  unsigned int runTime = 1000;
-  unsigned int cpuStatus = 0;
-  unsigned int currentJob = 0;
+void start(struct Job jobs[100], unsigned int numberOfJobs) {
 
-  for (clockTime; clockTime < runTime; clockTime++) {
-    for (unsigned int i = 0; i < numberOfJobs; i++) {
-      if (jobs[i].arrivalTime == clockTime) {
-        enqueueJob(&jobs[i]);
-      }
+  for (cpu->clockTime; cpu->clockTime < cpu->runTime; cpu->clockTime++) {
+    if (cpu->status == 1) {
+      printf("-CPU Status-\nClock Time:%u\nCurrent Job: %s\nService Time: %u\n\n",
+             cpu->clockTime, firstJob->jobName, firstJob->serviceTime);
+      firstJob->serviceTime--;
     }
+
+    //Arrival Queue
+    for (unsigned int i = 0; i < numberOfJobs; i++) {
+      arrivalFCFS(jobs, i);
+    }
+
+    //Run Scheduler
+    scheduleFCFS();
   }
 }
 
@@ -93,6 +101,27 @@ void printJobQueue() {
     printf("%s %u %u %u\n", tempJob->jobName, tempJob->arrivalTime,
                             tempJob->serviceTime, tempJob->priorityLevel);
     tempJob = tempJob->nextJob;
+  }
+}
+
+void arrivalFCFS(struct Job jobs[100], unsigned int jobIndex) {
+  if (jobs[jobIndex].arrivalTime == cpu->clockTime) {
+    enqueueJob(&jobs[jobIndex]);
+    if (cpu->status == 0) {
+      cpu->status = 1;
+    }
+  }
+}
+
+void scheduleFCFS() {
+  if (cpu->status == 1) {
+    if (firstJob->serviceTime == 0) {
+      printf("%s Complete\n\n", firstJob->jobName);
+      dequeueJob(); 
+      if (firstJob == NULL) {
+        cpu->status = 0;
+      }
+    }
   }
 }
 
