@@ -1,5 +1,4 @@
 #include "system.h"
-#include "fcfs.h"
 
 void init() {
   FILE *ifp;
@@ -32,79 +31,69 @@ void init() {
   fclose(ifp); 
 }
 
-unsigned int isJobComplete(unsigned int serviceTime) {
-  if (serviceTime == 0) {
-    return 1;
-  }
-  else
-    return 0;
-}
 
 void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
+  FILE *ofp;
+  char *ofMode = "w";
+  unsigned int isQueueEmpty = 1;
+  struct Job *cpuJob = NULL;
+  struct PriorityQueue priorityQueue;
 
-  for (cpu->clockTime; cpu->clockTime < cpu->runTime; cpu->clockTime++) {
-    //Need to check for completion of job
+  initPriorityQueue(&priorityQueue, numberOfJobs);
+
+  ofp = fopen("output/output.txt", ofMode);
+  
+  //Check for completion
+  for (cpu->clockTime = 0; cpu->clockTime < cpu->runTime; cpu->clockTime++) {
     if (cpu->status == 1) {
-      printf("-CPU Status-\nClock Time:%u\nCurrent Job: %s\nService Time: %u\n\n",
-             cpu->clockTime, firstJob->jobName, firstJob->serviceTime);
-      //firstJob->serviceTime--;
+      if (isJobComplete(cpuJob)) {
+        cpu->status = 0;
+        cpuJob->completeTime = cpu->clockTime;
+        fprintf(ofp, "%s %u %u %u\n", cpuJob->jobName, cpuJob->arrivalTime,
+                                      cpuJob->waitTime, cpuJob->completeTime);
+        free(cpuJob);
+        cpuJob = NULL;
+      }
     }
-    //Time Quantum
 
-    //Arrival Queue
+    //Check for arrivals
     for (unsigned int i = 0; i < numberOfJobs; i++) {
-      //arrivalFCFS(cpu, jobs, i);
+      if (jobs[i].arrivalTime == cpu->clockTime) {
+        enqueuePriority(jobs[i], &priorityQueue);
+        isQueueEmpty = 0;
+      }
     }
 
-    //Run Scheduler
-    //scheduleFCFS(cpu);
+    //Dispatch
+    if (cpu->status == 0) {
+      if (!isQueueEmpty) {
+        cpuJob = dequeuePriority(&priorityQueue);
+        if (cpuJob == NULL) {
+          isQueueEmpty = 1;
+          cpu->status = 0;
+        }
+        else {
+          cpuJob->waitTime = cpu->clockTime - cpuJob->arrivalTime;
+          cpu->status = 1;
+        }
+      }
+    }
+
+    if (cpu->status == 1) {
+      cpuJob->serviceTime--;
+    }
   }
+  free(cpuJob);
+  fclose(ofp); 
 }
 
-void enqueueJob(struct Job *job) {
-  struct Job *tempJob = (struct Job*)malloc(sizeof(struct Job));
 
-  strcpy(tempJob->jobName, job->jobName);
-  tempJob->arrivalTime = job->arrivalTime;
-  tempJob->serviceTime = job->serviceTime;
-  tempJob->priorityLevel = job->priorityLevel;
-  tempJob->nextJob = NULL;
-
-  if (firstJob == NULL && lastJob == NULL) {
-    firstJob = lastJob = tempJob;
-    return;
-  }
-
-  lastJob->nextJob = tempJob;
-  lastJob = tempJob;
-}
-
-void dequeueJob() {
-  struct Job *tempJob = firstJob;
-
-  if (firstJob == NULL) {
-    printf("Job queue is empty\n");
-    return;
-  }
-
-  if (firstJob == lastJob) {
-    firstJob = lastJob = NULL;
+unsigned int isJobComplete(struct Job *cpuJob) {
+  if (cpuJob->serviceTime == 0) {
+    return 1;
   }
   else {
-    firstJob = firstJob->nextJob;
-  }
-
-  free(tempJob);
-}
-
-
-void printJobQueue() {
-  struct Job *tempJob = firstJob;
-
-  while (tempJob != NULL) {
-    printf("%s %u %u %u\n", tempJob->jobName, tempJob->arrivalTime,
-                            tempJob->serviceTime, tempJob->priorityLevel);
-    tempJob = tempJob->nextJob;
+    return 0;
   }
 }
 
@@ -121,6 +110,7 @@ void heapInsert(struct Job job, struct Job *jobHeap, int size) {
     i = i/2;
   }
 }
+
 
 void downHeap(struct Job *jobHeap, int size, int i) {
   int child;
@@ -148,14 +138,15 @@ void downHeap(struct Job *jobHeap, int size, int i) {
   }
 }
 
+
 struct Job heapRemove(struct Job *jobHeap, int size) {
-  //int child;
   struct Job removedJob = jobHeap[1];
   jobHeap[1] = jobHeap[size];
   size--;
   downHeap(jobHeap, size, 1);
   return removedJob;
 }
+
 
 void buildHeap(struct Job *jobHeap, int size) {
   int i;
@@ -164,16 +155,20 @@ void buildHeap(struct Job *jobHeap, int size) {
   }
 }
 
+
 void enqueuePriority(struct Job job, struct PriorityQueue *pq) {
   heapInsert(job, pq->jobHeap, pq->size);
   pq->size++;
 }
 
+
 struct Job dequeuePriority(struct PriorityQueue *pq) {
   struct Job removedJob = heapRemove(pq->jobHeap, pq->size);
+  
   pq->size--;
   return removedJob;
 }
+
 
 void initPriorityQueue(struct PriorityQueue *pq, int size) {
   pq->size = 0;

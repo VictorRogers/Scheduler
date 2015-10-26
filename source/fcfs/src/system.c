@@ -32,15 +32,6 @@ void init() {
 }
 
 
-unsigned int isJobComplete(struct Job *cpuJob) {
-  if (cpuJob->serviceTime == 0) {
-    return 1;
-  }
-  else
-    return 0;
-}
-
-
 void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
   FILE *ofp;
   char *ofMode = "w";
@@ -52,7 +43,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
   ofp = fopen("output/output.txt", ofMode);
   
   //Check for completion
-  for (cpu->clockTime; cpu->clockTime < cpu->runTime; cpu->clockTime++) {
+  for (cpu->clockTime = 0; cpu->clockTime < cpu->runTime; cpu->clockTime++) {
     if (cpu->status == 1) {
       if (isJobComplete(cpuJob)) {
         cpu->status = 0;
@@ -88,14 +79,22 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
     }
 
     if (cpu->status == 1) {
-      printf("-CPU Status-\nClock Time: %u\nCurrent Job: %s\nService Time: %u\n\n",
-             cpu->clockTime, cpuJob->jobName, cpuJob->serviceTime);
       cpuJob->serviceTime--;
     }
   }
   free(cpuJob);
   fclose(ofp); 
 }
+
+
+unsigned int isJobComplete(struct Job *cpuJob) {
+  if (cpuJob->serviceTime == 0) {
+    return 1;
+  }
+  else
+    return 0;
+}
+
 
 void enqueueJob(struct Job *job, struct Job **firstJob, struct Job **lastJob) {
   struct Job *tempJob = (struct Job*)malloc(sizeof(struct Job));
@@ -116,6 +115,7 @@ void enqueueJob(struct Job *job, struct Job **firstJob, struct Job **lastJob) {
   (*lastJob)->nextJob = tempJob;
   *lastJob = tempJob;
 }
+
 
 struct Job * dequeueJob(struct Job **firstJob, struct Job **lastJob) {
   struct Job *tempJob = *firstJob;
