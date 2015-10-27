@@ -14,13 +14,13 @@ DEPS      := $(wildcard $(OBJ_DIR)/*.d)
 
 .PHONY: clean
 
-hpf: $(OBJECTS)
+sjf: $(OBJECTS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
 $(OBJECTS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $(OUTPUT_OPTION) $<
 
-clean: ; $(RM) $(DEPS) $(OBJECTS) $(OUTPUT) hpf
+clean: ; $(RM) $(DEPS) $(OBJECTS) $(OUTPUT) sjf
 
 -include $(DEPS)
 

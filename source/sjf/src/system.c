@@ -27,7 +27,6 @@ void init() {
   }
 
   fclose(ifp); 
-
   start(&cpu, jobs, numberOfJobs);
 }
 
@@ -37,9 +36,9 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
   FILE *ofp;
   char *ofMode = "w";
   struct Job *cpuJob = NULL;
-  struct PriorityQueue priorityQueue;
+  struct SJFQueue sjfQ;
 
-  initPriorityQueue(&priorityQueue, numberOfJobs);
+  initSJFQueue(&sjfQ, numberOfJobs);
 
   ofp = fopen("output/output.txt", ofMode);
 
@@ -65,14 +64,14 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
     //Check for arrivals
     for (unsigned int i = 0; i < numberOfJobs; i++) {
       if (jobs[i].arrivalTime == cpu->clockTime) {
-        enqueuePriority(jobs[i], &priorityQueue);
+        enqueueSJF(jobs[i], &sjfQ);
       }
     }
 
     //Dispatch
     if (cpu->status == 0) {
-      if (priorityQueue.size > 0) {
-        cpuJob = dequeuePriority(&priorityQueue);
+      if (sjfQ.size > 0) {
+        cpuJob = dequeueSJF(&sjfQ);
         cpuJob->waitTime = cpu->clockTime - cpuJob->arrivalTime;
         cpu->status = 1;
       }
@@ -102,7 +101,7 @@ void heapInsert(struct Job job, struct Job *jobHeap, int size) {
   struct Job tempJob;
   i = size + 1;
   jobHeap[i] = job;
-  while (jobHeap[i].priorityLevel > jobHeap[i/2].priorityLevel && i > 1) {
+  while (jobHeap[i].serviceTime < jobHeap[i/2].serviceTime && i > 1) {
     tempJob = jobHeap[i];
     jobHeap[i] = jobHeap[i/2];
     jobHeap[i/2] = tempJob;
@@ -121,11 +120,11 @@ void downHeap(struct Job *jobHeap, int size, int i) {
       downHeap = 0;
     }
     else if (child < size) {
-      if (jobHeap[child].priorityLevel < jobHeap[child + 1].priorityLevel) {
+      if (jobHeap[child].serviceTime > jobHeap[child + 1].serviceTime) {
         child++;
       }
     }
-    else if (jobHeap[child].priorityLevel > jobHeap[i].priorityLevel) {
+    else if (jobHeap[child].serviceTime < jobHeap[i].serviceTime) {
       tempJob = jobHeap[child];
       jobHeap[child] = jobHeap[i];
       jobHeap[i] = tempJob;
@@ -155,25 +154,25 @@ void buildHeap(struct Job *jobHeap, int size) {
 }
 
 
-void enqueuePriority(struct Job job, struct PriorityQueue *pq) {
-  heapInsert(job, pq->jobHeap, pq->size);
-  pq->size++;
+void enqueueSJF(struct Job job, struct SJFQueue *sjfQ) {
+  heapInsert(job, sjfQ->jobHeap, sjfQ->size);
+  sjfQ->size++;
 }
 
 
-struct Job * dequeuePriority(struct PriorityQueue *pq) {
+struct Job * dequeueSJF(struct SJFQueue *sjfQ) {
   struct Job *returnJob = (struct Job*)malloc(sizeof(struct Job));
-  struct Job removedJob = heapRemove(pq->jobHeap, pq->size);
+  struct Job removedJob = heapRemove(sjfQ->jobHeap, sjfQ->size);
   *returnJob = removedJob;
   
-  pq->size--;
+  sjfQ->size--;
   return returnJob;
 }
 
 
-void initPriorityQueue(struct PriorityQueue *pq, int size) {
-  pq->size = 0;
-  pq->jobHeap = (struct Job*)malloc(sizeof(struct Job)*(size+1));  
+void initSJFQueue(struct SJFQueue *sjfQ, int size) {
+  sjfQ->size = 0;
+  sjfQ->jobHeap = (struct Job*)malloc(sizeof(struct Job)*(size+1));  
 }
 
 void debug(struct CPU *cpu, struct Job *cpuJob) {

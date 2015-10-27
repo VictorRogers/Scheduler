@@ -21,7 +21,7 @@ struct Job {
   struct Job *nextJob;
 };
 
-struct PriorityQueue {
+struct SJFQueue {
   struct Job *jobHeap;
   int size;
 };
@@ -35,9 +35,9 @@ void downHeap(struct Job *jobHeap, int size, int i);
 struct Job heapRemove(struct Job *jobHeap, int size);
 void buildHeap(struct Job *jobHeap, int size);
 
-void enqueuePriority(struct Job job, struct PriorityQueue *pq);
-struct Job *dequeuePriority(struct PriorityQueue *pq);
-void initPriorityQueue(struct PriorityQueue *pq, int size);
+void enqueueSJF(struct Job job, struct SJFQueue *sjfQ);
+struct Job *dequeueSJF(struct SJFQueue *sjfQ);
+void initSJFQueue(struct SJFQueue *sjfQ, int size);
 
 void debug(struct CPU *cpu, struct Job *cpuJob);
 #endif
