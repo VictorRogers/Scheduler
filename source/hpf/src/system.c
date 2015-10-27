@@ -9,7 +9,7 @@ void init() {
   
   struct CPU cpu; 
   cpu.clockTime = 0;
-  cpu.runTime = 1000;
+  cpu.runTime = 10000;
   cpu.status = 0;
 
   ifp = fopen("input/input.txt", ifMode);

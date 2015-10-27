@@ -41,6 +41,11 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
   struct Job *lastJob = NULL;
 
   ofp = fopen("output/output.txt", ofMode);
+
+  if (ofp == NULL) {
+    perror("Error creating output file");
+    exit(1);
+  }
   
   //Check for completion
   for (cpu->clockTime = 0; cpu->clockTime < cpu->runTime; cpu->clockTime++) {
@@ -53,7 +58,15 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
         free(cpuJob);
         cpuJob = NULL;
       }
+      else if (isTimeQuantumComplete(cpuJob)) {
+        enqueueJob(cpuJob, &firstJob, &lastJob);
+        cpu->status = 0;
+        free(cpuJob);
+        cpuJob = NULL;
+      }
     }
+
+    //Check for completion of time quantum
 
     //Check for arrivals
     for (unsigned int i = 0; i < numberOfJobs; i++) {
@@ -73,6 +86,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
         }
         else {
           cpuJob->waitTime = cpu->clockTime - cpuJob->arrivalTime;
+          cpuJob->timeQuantum = 10;
           cpu->status = 1;
         }
       }
@@ -80,6 +94,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
 
     if (cpu->status == 1) {
       cpuJob->serviceTime--;
+      cpuJob->timeQuantum--;
     }
   }
   free(cpuJob);
@@ -91,10 +106,19 @@ unsigned int isJobComplete(struct Job *cpuJob) {
   if (cpuJob->serviceTime == 0) {
     return 1;
   }
-  else
+  else {
     return 0;
+  }
 }
 
+unsigned int isTimeQuantumComplete(struct Job *cpuJob) {
+  if (cpuJob->timeQuantum == 0) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
 
 void enqueueJob(struct Job *job, struct Job **firstJob, struct Job **lastJob) {
   struct Job *tempJob = (struct Job*)malloc(sizeof(struct Job));

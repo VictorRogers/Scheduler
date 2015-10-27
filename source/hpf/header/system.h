@@ -40,4 +40,5 @@ struct Job * dequeuePriority(struct PriorityQueue *pq);
 void initPriorityQueue(struct PriorityQueue *pq, int size);
 
 void debug(struct CPU *cpu, struct Job *cpuJob);
+
 #endif
