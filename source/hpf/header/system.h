@@ -36,7 +36,8 @@ struct Job heapRemove(struct Job *jobHeap, int size);
 void buildHeap(struct Job *jobHeap, int size);
 
 void enqueuePriority(struct Job job, struct PriorityQueue *pq);
-struct Job dequeuePriority(struct PriorityQueue *pq);
+struct Job * dequeuePriority(struct PriorityQueue *pq);
 void initPriorityQueue(struct PriorityQueue *pq, int size);
 
+void debug(struct CPU *cpu, struct Job *cpuJob);
 #endif
