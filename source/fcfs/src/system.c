@@ -1,5 +1,14 @@
 #include "system.h"
 
+/* Victor Rogers
+ * CS 420
+ * First Come First Serve Scheduler Simulation
+ *
+ * FCFS Implementation
+ */
+
+ 
+//init - Reads in input file containing information on jobs and stores the job information in an array
 void init() {
   FILE *ifp;
   char *ifMode = "r";
@@ -32,6 +41,7 @@ void init() {
 }
 
 
+//start - Starts the CPU and the scheduler. Runs jobs, checks for completion, checks for new arrivals, and dispatches jobs
 void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
   FILE *ofp;
   char *ofMode = "w";
@@ -87,6 +97,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
 }
 
 
+//isJobComplete - Checks to see if the current job is complete
 unsigned int isJobComplete(struct Job *cpuJob) {
   if (cpuJob->serviceTime == 0) {
     return 1;
@@ -96,6 +107,7 @@ unsigned int isJobComplete(struct Job *cpuJob) {
 }
 
 
+//enqueueJob - Adds a job to the rear of the wait queue
 void enqueueJob(struct Job *job, struct Job **firstJob, struct Job **lastJob) {
   struct Job *tempJob = (struct Job*)malloc(sizeof(struct Job));
 
@@ -117,6 +129,7 @@ void enqueueJob(struct Job *job, struct Job **firstJob, struct Job **lastJob) {
 }
 
 
+//dequeueJob - Removes and returns the job at the front of the queue
 struct Job * dequeueJob(struct Job **firstJob, struct Job **lastJob) {
   struct Job *tempJob = *firstJob;
 
