@@ -1,5 +1,13 @@
 #include "system.h"
 
+/* Victor Rogers
+ * CS 420
+ * Shortest Job First Scheduler Simulation
+ *
+ * SJF Implementation
+ */
+
+//init - Reads in input file containing information on jobs and stores the job information in an array
 void init() {
   FILE *ifp;
   char *ifMode = "r";
@@ -31,7 +39,7 @@ void init() {
 }
 
 
-
+//start - Starts the CPU and the scheduler. Runs jobs, checks for completion, checks for new arrivals, and dispatches jobs
 void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
   FILE *ofp;
   char *ofMode = "w";
@@ -86,6 +94,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
 }
 
 
+//isJobComplete - Checks to see if the current job is complete
 unsigned int isJobComplete(struct Job *cpuJob) {
   if (cpuJob->serviceTime == 0) {
     return 1;
@@ -96,6 +105,7 @@ unsigned int isJobComplete(struct Job *cpuJob) {
 }
 
 
+//heapInsert - Inserts a job into the heap and calls downHeap to sort the job by its service time
 void heapInsert(struct Job job, struct Job *jobHeap, int size) {
   int i;
   struct Job tempJob;
@@ -110,6 +120,7 @@ void heapInsert(struct Job job, struct Job *jobHeap, int size) {
 }
 
 
+//downHeap - Sorts the heap by job service time
 void downHeap(struct Job *jobHeap, int size, int i) {
   int child;
   struct Job tempJob;
@@ -137,6 +148,7 @@ void downHeap(struct Job *jobHeap, int size, int i) {
 }
 
 
+//heapRemove - Removes a job from the top of the heap
 struct Job heapRemove(struct Job *jobHeap, int size) {
   struct Job removedJob = jobHeap[1];
   jobHeap[1] = jobHeap[size];
@@ -146,6 +158,7 @@ struct Job heapRemove(struct Job *jobHeap, int size) {
 }
 
 
+//buildHeap - Constructs the heap
 void buildHeap(struct Job *jobHeap, int size) {
   int i;
   for (i = size/2; i > 0; i--) {
@@ -154,12 +167,14 @@ void buildHeap(struct Job *jobHeap, int size) {
 }
 
 
+//enqueueSJF - Enqueues a job into the heap by service time
 void enqueueSJF(struct Job job, struct SJFQueue *sjfQ) {
   heapInsert(job, sjfQ->jobHeap, sjfQ->size);
   sjfQ->size++;
 }
 
 
+//dequeueSJF - Dequeues a job from the top of the heap and returns it
 struct Job * dequeueSJF(struct SJFQueue *sjfQ) {
   struct Job *returnJob = (struct Job*)malloc(sizeof(struct Job));
   struct Job removedJob = heapRemove(sjfQ->jobHeap, sjfQ->size);
@@ -170,11 +185,15 @@ struct Job * dequeueSJF(struct SJFQueue *sjfQ) {
 }
 
 
+//initSJFQueue - Initializes the SJF Queue
 void initSJFQueue(struct SJFQueue *sjfQ, int size) {
   sjfQ->size = 0;
   sjfQ->jobHeap = (struct Job*)malloc(sizeof(struct Job)*(size+1));  
 }
 
+
+//debug - A function for debugging purposes
+//Prints diagnostic information
 void debug(struct CPU *cpu, struct Job *cpuJob) {
   printf(" -DEBUG-\n");
   printf("Clock Time: %u\n", cpu->clockTime);

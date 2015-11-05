@@ -84,19 +84,24 @@ struct Job heapRemove(struct Job *jobHeap, int size);
 //      - Param 2 - The size of the heap
 void buildHeap(struct Job *jobHeap, int size);
 
-//enqueuePriority - Enqueues a job into the heap by service time
+//enqueueSJF - Enqueues a job into the heap by service time
 //      - Param 1 - The job to be inserted
 //      - Param 2 - A pointer to the SJF Queue struct
 void enqueueSJF(struct Job job, struct SJFQueue *sjfQ);
 
-//dequeuePriority - Dequeues a job from the top of the heap and returns it
+//dequeueSJF - Dequeues a job from the top of the heap and returns it
 //      - Param 1 - A pointer to the SJF Queue struct
 struct Job *dequeueSJF(struct SJFQueue *sjfQ);
 
-//initPriorityQueue - Initializes the SJF Queue
+//initSJFQueue - Initializes the SJF Queue
 //      - Param 1 - A pointer to the SJF Queue struct
 //		- Param 2 - The size of the SJF Queue
 void initSJFQueue(struct SJFQueue *sjfQ, int size);
 
+//debug - A function for debugging purposes
+//Prints diagnostic information
+//		- Param 1 - A pointer to the CPU struct
+//		- Param 2 - A pointer to the job currently running in the CPU
 void debug(struct CPU *cpu, struct Job *cpuJob);
+
 #endif
