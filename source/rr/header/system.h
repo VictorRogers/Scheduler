@@ -30,6 +30,7 @@ struct CPU {
 //    Wait Time      - Total amount of time that the job has been in the wait queue
 //    Complete Time  - The clock time that the job completed at
 //	  Time Quantum   - The remaining time before the job will be preempted by the CPU
+//	  Last Left CPU  - The time that the job last left the CPU - Used for computing wait time in RR
 //    Next Job       - A pointer to the next job in the wait queue
 struct Job {
   char jobName[3];
@@ -38,6 +39,7 @@ struct Job {
   unsigned int priorityLevel;
   unsigned int waitTime;
   unsigned int completeTime;
+  unsigned int lastLeftCPUTime;
   unsigned int timeQuantum;
   struct Job *nextJob;
 };

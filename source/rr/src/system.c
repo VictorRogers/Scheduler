@@ -30,6 +30,8 @@ void init() {
   while (!feof(ifp)) {
     fscanf(ifp, "%s %u %u %u\n", jobs[i].jobName, &jobs[i].arrivalTime,
                              &jobs[i].serviceTime, &jobs[i].priorityLevel);
+	jobs[i].lastLeftCPUTime = 0;
+    jobs[i].waitTime = 0;
     i++;
     numberOfJobs = i;
   }
@@ -61,6 +63,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
     if (cpu->status == 1) {
       if (isJobComplete(cpuJob)) {
         cpu->status = 0;
+		cpuJob->waitTime = cpuJob->waitTime - 10;
         cpuJob->completeTime = cpu->clockTime;
         fprintf(ofp, "%s %u %u %u\n", cpuJob->jobName, cpuJob->arrivalTime,
                                       cpuJob->waitTime, cpuJob->completeTime);
@@ -68,6 +71,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
         cpuJob = NULL;
       }
       else if (isTimeQuantumComplete(cpuJob)) {
+		cpuJob->lastLeftCPUTime = cpu->clockTime;
         enqueueJob(cpuJob, &firstJob, &lastJob);
         cpu->status = 0;
         free(cpuJob);
@@ -94,7 +98,11 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
           cpu->status = 0;
         }
         else {
-          cpuJob->waitTime = cpu->clockTime - cpuJob->arrivalTime;
+		  if (cpuJob->waitTime > 0) {
+		    cpuJob->waitTime = cpuJob->waitTime + (cpu->clockTime - cpuJob->lastLeftCPUTime);	  
+		  }
+		  else
+		    cpuJob->waitTime = cpu->clockTime - cpuJob->arrivalTime;
           cpuJob->timeQuantum = 10;
           cpu->status = 1;
         }
