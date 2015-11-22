@@ -30,8 +30,8 @@ void init() {
   while (!feof(ifp)) {
     fscanf(ifp, "%s %u %u %u\n", jobs[i].jobName, &jobs[i].arrivalTime,
                              &jobs[i].serviceTime, &jobs[i].priorityLevel);
-	jobs[i].lastLeftCPUTime = 0;
     jobs[i].waitTime = 0;
+    jobs[i].timeInCPU = 0;
     i++;
     numberOfJobs = i;
   }
@@ -63,7 +63,8 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
     if (cpu->status == 1) {
       if (isJobComplete(cpuJob)) {
         cpu->status = 0;
-		cpuJob->waitTime = cpuJob->waitTime - 10;
+        printf("Name - %s, FST - %u, TICPU - %u\n", cpuJob->jobName, cpuJob->finalStartTime, cpuJob->timeInCPU);
+		    cpuJob->waitTime = cpuJob->finalStartTime - cpuJob->timeInCPU - cpuJob->arrivalTime; 
         cpuJob->completeTime = cpu->clockTime;
         fprintf(ofp, "%s %u %u %u\n", cpuJob->jobName, cpuJob->arrivalTime,
                                       cpuJob->waitTime, cpuJob->completeTime);
@@ -71,7 +72,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
         cpuJob = NULL;
       }
       else if (isTimeQuantumComplete(cpuJob)) {
-		cpuJob->lastLeftCPUTime = cpu->clockTime;
+		    cpuJob->timeInCPU = cpuJob->timeInCPU + 10;
         enqueueJob(cpuJob, &firstJob, &lastJob);
         cpu->status = 0;
         free(cpuJob);
@@ -98,12 +99,10 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
           cpu->status = 0;
         }
         else {
-		  if (cpuJob->waitTime > 0) {
-		    cpuJob->waitTime = cpuJob->waitTime + (cpu->clockTime - cpuJob->lastLeftCPUTime);	  
-		  }
-		  else
-		    cpuJob->waitTime = cpu->clockTime - cpuJob->arrivalTime;
           cpuJob->timeQuantum = 10;
+          if (cpuJob->serviceTime <= cpuJob->timeQuantum) {
+            cpuJob->finalStartTime = cpu->clockTime;
+          }
           cpu->status = 1;
         }
       }
@@ -150,6 +149,7 @@ void enqueueJob(struct Job *job, struct Job **firstJob, struct Job **lastJob) {
   tempJob->serviceTime = job->serviceTime;
   tempJob->priorityLevel = job->priorityLevel;
   tempJob->waitTime = job->waitTime;
+  tempJob->timeInCPU = job->timeInCPU;
   tempJob->completeTime = job->completeTime;
   tempJob->nextJob = NULL;
 

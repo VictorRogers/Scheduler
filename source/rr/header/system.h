@@ -38,8 +38,9 @@ struct Job {
   unsigned int serviceTime;
   unsigned int priorityLevel;
   unsigned int waitTime;
+  unsigned int finalStartTime;
   unsigned int completeTime;
-  unsigned int lastLeftCPUTime;
+  unsigned int timeInCPU;
   unsigned int timeQuantum;
   struct Job *nextJob;
 };
