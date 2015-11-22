@@ -49,7 +49,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
 
   initPriorityQueue(&priorityQueue, numberOfJobs);
 
-  ofp = fopen("output/output.txt", ofMode);
+  ofp = fopen("output/hpfOutput.txt", ofMode);
 
   if (ofp == NULL) {
     perror("Error creating output file");

@@ -51,7 +51,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
   struct Job *firstJob = NULL;
   struct Job *lastJob = NULL;
 
-  ofp = fopen("output/output.txt", ofMode);
+  ofp = fopen("output/rrOutput.txt", ofMode);
 
   if (ofp == NULL) {
     perror("Error creating output file");

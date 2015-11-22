@@ -50,7 +50,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
   struct Job *firstJob = NULL;
   struct Job *lastJob = NULL;
 
-  ofp = fopen("output/output.txt", ofMode);
+  ofp = fopen("output/fcfsOutput.txt", ofMode);
   
   //Check for completion
   for (cpu->clockTime = 0; cpu->clockTime < cpu->runTime; cpu->clockTime++) {

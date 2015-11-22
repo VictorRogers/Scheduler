@@ -48,7 +48,7 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
 
   initSJFQueue(&sjfQ, numberOfJobs);
 
-  ofp = fopen("output/output.txt", ofMode);
+  ofp = fopen("output/sjfOutput.txt", ofMode);
 
   if (ofp == NULL) {
     perror("Error creating output file");
