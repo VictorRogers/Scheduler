@@ -17,7 +17,7 @@ void init() {
   
   struct CPU cpu; 
   cpu.clockTime = 0;
-  cpu.runTime = 1000;
+  cpu.runTime = 100000;
   cpu.status = 0;
 
   ifp = fopen("input/input.txt", ifMode);
@@ -105,7 +105,7 @@ unsigned int isJobComplete(struct Job *cpuJob) {
 }
 
 
-//heapInsert - Inserts a job into the heap and calls downHeap to sort the job by its service time
+//heapInsert - Inserts a job into the heap and upHeap to sort the job by its service time
 void heapInsert(struct Job job, struct Job *jobHeap, int size) {
   int i;
   struct Job tempJob;
@@ -125,26 +125,45 @@ void downHeap(struct Job *jobHeap, int size, int i) {
   int child;
   struct Job tempJob;
   unsigned int downHeap = 1;
+
   while (downHeap) {
     child = i*2;
-    if (child > size) {
+    if (child > size) { //Case 1: Current has no children
       downHeap = 0;
     }
-    else if (child < size) {
-      if (jobHeap[child].serviceTime > jobHeap[child + 1].serviceTime) {
-        child++;
+    else if ((child + 1) > size) { //Case 2: There is no right child
+      if (jobHeap[i].serviceTime > jobHeap[child].serviceTime) {
+        tempJob = jobHeap[child];
+        jobHeap[child] = jobHeap[i];
+        jobHeap[i] = tempJob;
+        i = i * 2;
+      }
+      downHeap = 0; //Reached bottom of the heap
+    }
+    else { //Case 3: There is two children
+      if (jobHeap[child].serviceTime > jobHeap[child + 1].serviceTime) { //Swap children if left is greater
+        tempJob = jobHeap[child + 1];
+        jobHeap[child + 1] = jobHeap[child];
+        jobHeap[child] = tempJob;
+      }
+      if (jobHeap[i].serviceTime > jobHeap[child].serviceTime) { //Case 3a: Left is shorter
+        tempJob = jobHeap[child];
+        jobHeap[child] = jobHeap[i];
+        jobHeap[i] = tempJob;
+        i = i * 2;
+      }
+      else if (jobHeap[i].serviceTime > jobHeap[child + 1].serviceTime) { //Case 3b: Right is shorter 
+        tempJob = jobHeap[child];
+        jobHeap[child] = jobHeap[i];
+        jobHeap[i] = tempJob;
+        i = i *2;
+      }
+      else { //Case 3c: Both are greater
+        downHeap = 0;
       }
     }
-    else if (jobHeap[child].serviceTime < jobHeap[i].serviceTime) {
-      tempJob = jobHeap[child];
-      jobHeap[child] = jobHeap[i];
-      jobHeap[i] = tempJob;
-      i = child;
-    }
-    else {
-      downHeap = 0;
-    }
   }
+
 }
 
 

@@ -17,7 +17,7 @@ void init() {
   
   struct CPU cpu; 
   cpu.clockTime = 0;
-  cpu.runTime = 10000;
+  cpu.runTime = 100000;
   cpu.status = 0;
 
   ifp = fopen("input/input.txt", ifMode);
@@ -63,7 +63,6 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
     if (cpu->status == 1) {
       if (isJobComplete(cpuJob)) {
         cpu->status = 0;
-        printf("Name - %s, FST - %u, TICPU - %u\n", cpuJob->jobName, cpuJob->finalStartTime, cpuJob->timeInCPU);
 		    cpuJob->waitTime = cpuJob->finalStartTime - cpuJob->timeInCPU - cpuJob->arrivalTime; 
         cpuJob->completeTime = cpu->clockTime;
         fprintf(ofp, "%s %u %u %u\n", cpuJob->jobName, cpuJob->arrivalTime,

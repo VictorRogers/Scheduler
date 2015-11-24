@@ -17,7 +17,7 @@ void init() {
   
   struct CPU cpu; 
   cpu.clockTime = 0;
-  cpu.runTime = 10000;
+  cpu.runTime = 100000;
   cpu.status = 0;
 
   ifp = fopen("input/input.txt", ifMode);
@@ -68,7 +68,6 @@ void start(struct CPU *cpu, struct Job jobs[100], unsigned int numberOfJobs) {
         cpuJob = NULL;
       }
     }
-
     //Check for arrivals
     for (unsigned int i = 0; i < numberOfJobs; i++) {
       if (jobs[i].arrivalTime == cpu->clockTime) {
@@ -125,26 +124,45 @@ void downHeap(struct Job *jobHeap, int size, int i) {
   int child;
   struct Job tempJob;
   unsigned int downHeap = 1;
+
   while (downHeap) {
     child = i*2;
-    if (child > size) {
+    if (child > size) { //Case 1: Current has no children
       downHeap = 0;
     }
-    else if (child < size) {
-      if (jobHeap[child].priorityLevel < jobHeap[child + 1].priorityLevel) {
-        child++;
+    else if ((child + 1) > size) { //Case 2: There is no right child
+      if (jobHeap[i].priorityLevel < jobHeap[child].priorityLevel) {
+        tempJob = jobHeap[child];
+        jobHeap[child] = jobHeap[i];
+        jobHeap[i] = tempJob;
+        i = i * 2;
+      }
+      downHeap = 0; //Reached bottom of the heap
+    }
+    else { //Case 3: There is two children
+      if (jobHeap[child].priorityLevel < jobHeap[child + 1].priorityLevel) { //Swap children if left is smaller 
+        tempJob = jobHeap[child + 1];
+        jobHeap[child + 1] = jobHeap[child];
+        jobHeap[child] = tempJob;
+      }
+      if (jobHeap[i].priorityLevel < jobHeap[child].priorityLevel) { //Case 3a: Left is greater
+        tempJob = jobHeap[child];
+        jobHeap[child] = jobHeap[i];
+        jobHeap[i] = tempJob;
+        i = i * 2;
+      }
+      else if (jobHeap[i].priorityLevel < jobHeap[child + 1].priorityLevel) { //Case 3b: Right is greater 
+        tempJob = jobHeap[child];
+        jobHeap[child] = jobHeap[i];
+        jobHeap[i] = tempJob;
+        i = i *2;
+      }
+      else { //Case 3c: Both are smaller 
+        downHeap = 0;
       }
     }
-    else if (jobHeap[child].priorityLevel > jobHeap[i].priorityLevel) {
-      tempJob = jobHeap[child];
-      jobHeap[child] = jobHeap[i];
-      jobHeap[i] = tempJob;
-      i = child;
-    }
-    else {
-      downHeap = 0;
-    }
   }
+
 }
 
 
