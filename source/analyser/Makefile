@@ -14,13 +14,13 @@ DEPS      := $(wildcard $(OBJ_DIR)/*.d)
 
 .PHONY: clean
 
-analyzer: $(OBJECTS)
+analyser: $(OBJECTS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
 $(OBJECTS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $(OUTPUT_OPTION) $<
 
-clean: ; $(RM) $(DEPS) $(OBJECTS) $(OUTPUT) analyzer 
+clean: ; $(RM) $(DEPS) $(OBJECTS) $(OUTPUT) analyser 
 
 -include $(DEPS)
 
