@@ -130,8 +130,8 @@ void analysePerformance(struct Job fcfsJobs[100], struct Job hpfJobs[100], struc
 	rrWaitAvg = rrWaitSum / rrNumberOfJobs;
 	sjfWaitAvg = sjfWaitSum / sjfNumberOfJobs;
 	
-	fprintf("FCFS Wait Average = %d\n", fcfsWaitAvg);
-	fprintf("HPF Wait Average = %d\n", hpfWaitAvg);
-	fprintf("RR Wait Average = %d\n", rrWaitAvg);
-	fprintf("SJF Wait Average = %d\n", sjfWaitAvg);
+	printf("FCFS Wait Average = %d\n", fcfsWaitAvg);
+	printf("HPF Wait Average = %d\n", hpfWaitAvg);
+	printf("RR Wait Average = %d\n", rrWaitAvg);
+	printf("SJF Wait Average = %d\n", sjfWaitAvg);
 }
