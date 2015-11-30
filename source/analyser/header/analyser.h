@@ -14,4 +14,9 @@ struct Job {
 
 void init();
 
+void analysePerformance(struct Job fcfsJobs[100], struct Job hpfJobs[100], struct Job rrJobs[100],
+		                    struct Job sjfJobs[100], unsigned int fcfsNumberOfJobs,
+												unsigned int hpfNumberOfJobs, unsigned int rrNumberOfJobs,
+												unsigned int sjfNumberOfJobs);
+
 #endif
