@@ -1,5 +1,13 @@
 #include "analyser.h"
 
+/* Victor Rogers
+ * CS 420
+ * Statistical Analyser for Scheduling Algorithms 
+ *
+ * Analyser Implementation
+ */
+
+//Reads in data from scheduling algorithm output files and prepares them for statistical analysis
 void init() {
 	FILE *fcfsIFP;
 	FILE *hpfIFP;
@@ -92,6 +100,7 @@ void init() {
 			               rrNumberOfJobs, sjfNumberOfJobs);
 }
 
+//Performs computations for mean and variance on all of the algorithm's data sets
 void analysePerformance(struct Job fcfsJobs[100], struct Job hpfJobs[100], struct Job rrJobs[100],
 		                    struct Job sjfJobs[100], unsigned int fcfsNumberOfJobs,
 												unsigned int hpfNumberOfJobs, unsigned int rrNumberOfJobs,
@@ -109,29 +118,62 @@ void analysePerformance(struct Job fcfsJobs[100], struct Job hpfJobs[100], struc
 	int hpfWaitAvg = 0;
 	int rrWaitAvg = 0;
 	int sjfWaitAvg = 0;
+	float fcfsVariance = 0;
+	float hpfVariance = 0;
+	float rrVariance = 0;
+	float sjfVariance = 0;
 
+	//First Come First Served Computations
 	for (unsigned int i = 0; i < fcfsNumberOfJobs; i++) {
     fcfsWaitSum = fcfsWaitSum + fcfsJobs[i].waitTime;
 	}
+	fcfsWaitAvg = fcfsWaitSum / fcfsNumberOfJobs;
+	for (unsigned int i = 0; i < fcfsNumberOfJobs; i++) {
+    fcfsVariance = fcfsVariance + ((fcfsJobs[i].waitTime - fcfsWaitAvg) *
+				                           (fcfsJobs[i].waitTime - fcfsWaitAvg));
+	}
+	fcfsVariance = fcfsVariance / fcfsNumberOfJobs;
 
+  //Highest Priority First Computations
 	for (unsigned int i = 0; i < hpfNumberOfJobs; i++) {
     hpfWaitSum = hpfWaitSum + hpfJobs[i].waitTime;
 	}
-
+	hpfWaitAvg = hpfWaitSum / hpfNumberOfJobs;
+	for (unsigned int i = 0; i < hpfNumberOfJobs; i++) {
+    hpfVariance = hpfVariance + ((hpfJobs[i].waitTime - hpfWaitAvg) *
+				                           (hpfJobs[i].waitTime - hpfWaitAvg));
+	}
+	hpfVariance = hpfVariance / hpfNumberOfJobs;
+  
+	//Round Robin Computations
 	for (unsigned int i = 0; i < rrNumberOfJobs; i++) {
     rrWaitSum = rrWaitSum + rrJobs[i].waitTime;
 	}
-	
+	rrWaitAvg = rrWaitSum / rrNumberOfJobs;
+	for (unsigned int i = 0; i < rrNumberOfJobs; i++) {
+    rrVariance = rrVariance + ((rrJobs[i].waitTime - rrWaitAvg) *
+				                           (rrJobs[i].waitTime - rrWaitAvg));
+	}
+	rrVariance = rrVariance / rrNumberOfJobs;
+
+  //Shortest Job First Computations
 	for (unsigned int i = 0; i < sjfNumberOfJobs; i++) {
     sjfWaitSum = sjfWaitSum + sjfJobs[i].waitTime;
 	}
-	fcfsWaitAvg = fcfsWaitSum / fcfsNumberOfJobs;
-	hpfWaitAvg = hpfWaitSum / hpfNumberOfJobs;
-	rrWaitAvg = rrWaitSum / rrNumberOfJobs;
 	sjfWaitAvg = sjfWaitSum / sjfNumberOfJobs;
-	
-	printf("FCFS Wait Average = %d\n", fcfsWaitAvg);
-	printf("HPF Wait Average = %d\n", hpfWaitAvg);
-	printf("RR Wait Average = %d\n", rrWaitAvg);
-	printf("SJF Wait Average = %d\n", sjfWaitAvg);
+	for (unsigned int i = 0; i < sjfNumberOfJobs; i++) {
+    sjfVariance = sjfVariance + ((sjfJobs[i].waitTime - sjfWaitAvg) *
+				                           (sjfJobs[i].waitTime - sjfWaitAvg));
+	}
+	sjfVariance = sjfVariance / sjfNumberOfJobs;
+
+	//Outputting to analysis.txt in the output directory
+	fprintf(ofp, "FCFS Wait Average = %d\n", fcfsWaitAvg);
+	fprintf(ofp, "FCFS Variance = %f\n\n", fcfsVariance);
+	fprintf(ofp, "HPF Wait Average = %d\n", hpfWaitAvg);
+	fprintf(ofp, "HPF Variance = %f\n\n", hpfVariance);
+	fprintf(ofp, "RR Wait Average = %d\n", rrWaitAvg);
+	fprintf(ofp, "RR Variance = %f\n\n", rrVariance);
+	fprintf(ofp, "SJF Wait Average = %d\n", sjfWaitAvg);
+	fprintf(ofp, "SJF Variance = %f\n\n", sjfVariance);
 }
